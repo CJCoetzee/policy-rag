@@ -1,0 +1,22 @@
+[
+  {"question":"How many PTO days do new employees get?","gold":"15 days"},
+  {"question":"How many PTO days do employees with 4 years of service receive?","gold":"20 days"},
+  {"question":"How many sick days are granted per year?","gold":"10 sick days"},
+  {"question":"How many PTO days can be carried over?","gold":"5 days"},
+  {"question":"How many days per week may employees work remotely?","gold":"3 days per week"},
+  {"question":"What are the required core working hours for remote employees?","gold":"09:00 – 16:00"},
+  {"question":"How long is the probation period?","gold":"3 months"},
+  {"question":"How quickly must lost equipment be reported?","gold":"24 hours"},
+  {"question":"What is the minimum password length?","gold":"12 characters"},
+  {"question":"How often must passwords be changed?","gold":"180 days"},
+  {"question":"What is the dinner reimbursement limit?","gold":"40 dollars"},
+  {"question":"What is the annual education reimbursement limit?","gold":"1000 dollars"},
+  {"question":"What percentage of medical insurance premiums does the company cover?","gold":"70%"},
+  {"question":"What percentage of salary does the company contribute to retirement?","gold":"5%"},
+  {"question":"How many days in advance must PTO be requested for planned leave?","gold":"2 weeks"},
+  {"question":"Are employees paid double for working on holidays?","gold":"Double pay"},
+  {"question":"What class of flight must employees book?","gold":"Economy class"},
+  {"question":"Does the company provide travel insurance?","gold":"Yes"},
+  {"question":"What is the daily per diem for travel?","gold":"60 dollars"},
+  {"question":"How long do employees have to submit expenses?","gold":"30 days"}
+]
