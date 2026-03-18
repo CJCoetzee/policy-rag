@@ -15,15 +15,23 @@ llm = None
 prompt = None
 
 
+rag_loaded = False
+
 def load_rag():
-    global retriever, llm, prompt
+    global retriever, llm, prompt, rag_loaded
 
-    if retriever is None:
+    if not rag_loaded:
 
-        if not os.path.exists("vectorstore") and os.path.exists("data/policies"):
-          ingest()
+        print("Loading RAG...")
+
+        if not os.path.exists("vectorstore"):
+            ingest()
 
         retriever, llm, prompt = build_rag()
+
+        rag_loaded = True
+
+        print("RAG loaded.")
 
 
 @app.route("/health")
