@@ -1,6 +1,3 @@
-from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_core.prompts import PromptTemplate
 from langchain_core.language_models.llms import LLM
 
 from app.config import *
@@ -72,6 +69,10 @@ Answer:
 
 
 def build_rag():
+    from langchain_chroma import Chroma
+    from langchain_huggingface import HuggingFaceEmbeddings
+    from langchain_core.prompts import PromptTemplate
+
 
     embeddings = HuggingFaceEmbeddings(
         model_name=EMBEDDING_MODEL,
