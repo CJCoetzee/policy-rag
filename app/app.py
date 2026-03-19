@@ -7,8 +7,6 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 from dotenv import load_dotenv
 load_dotenv()
 
-from app.ingest import ingest
-from app.rag import build_rag
 
 app = Flask(__name__)
 
@@ -26,9 +24,12 @@ def load_rag():
 
         print("Loading RAG...")
 
-        # 🚨 Skip ingest in production (Render)
+        # Lazy import (CRITICAL)
+        from app.rag import build_rag
+
+        # 🚨 DO NOT ingest on Render
         if not os.path.exists("vectorstore"):
-            return  # do NOT ingest in prod
+            print("Vectorstore missing - skipping ingest in production")
 
         retriever, llm, prompt = build_rag()
 
