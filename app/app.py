@@ -24,8 +24,12 @@ def load_rag():
 
         print("Loading RAG...")
 
+        # 🚨 Skip ingest in production (Render)
         if not os.path.exists("vectorstore"):
-            ingest()
+            if os.getenv("RENDER") != "true":
+                ingest()
+            else:
+                print("Skipping ingest on Render")
 
         retriever, llm, prompt = build_rag()
 
