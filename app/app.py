@@ -102,124 +102,128 @@ def chat():
 @app.route("/")
 def home():
       return "OK"
-#     return """
-# <!DOCTYPE html>
-# <html>
-# <head>
-#     <title>Policy Assistant</title>
-#     <script src="https://cdn.tailwindcss.com"></script>
-# </head>
 
-# <body class="bg-gray-100">
+@app.route("/ui")
+def ui():
+    return """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Policy Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-# <div class="max-w-3xl mx-auto p-4">
+<body class="bg-gray-100">
 
-#     <h1 class="text-2xl font-bold mb-4">Policy Assistant</h1>
+<div class="max-w-3xl mx-auto p-4">
 
-#     <div id="chat" class="bg-white p-4 rounded shadow h-[500px] overflow-y-auto space-y-4"></div>
+    <h1 class="text-2xl font-bold mb-4">Policy Assistant</h1>
 
-#     <div class="mt-4 flex gap-2">
-#         <input id="question"
-#                class="flex-1 p-2 border rounded"
-#                placeholder="Ask a policy question..." />
-#         <button onclick="ask()"
-#                 class="bg-blue-500 text-white px-4 py-2 rounded">
-#             Send
-#         </button>
-#     </div>
+    <div id="chat" class="bg-white p-4 rounded shadow h-[500px] overflow-y-auto space-y-4"></div>
 
-#     <div id="loading" class="hidden mt-2 text-gray-500">Thinking...</div>
+    <div class="mt-4 flex gap-2">
+        <input id="question"
+               class="flex-1 p-2 border rounded"
+               placeholder="Ask a policy question..." />
+        <button onclick="ask()"
+                class="bg-blue-500 text-white px-4 py-2 rounded">
+            Send
+        </button>
+    </div>
 
-# </div>
+    <div id="loading" class="hidden mt-2 text-gray-500">Thinking...</div>
 
-# <script>
+</div>
 
-# let chatHistory = [];
+<script>
 
-# function addMessage(role, text, sources=[]) {
+let chatHistory = [];
 
-#     const chat = document.getElementById("chat");
+function addMessage(role, text, sources=[]) {
 
-#     let bubble = document.createElement("div");
+    const chat = document.getElementById("chat");
 
-#     bubble.className = role === "user"
-#         ? "text-right"
-#         : "text-left";
+    let bubble = document.createElement("div");
 
-#     let content = `
-#         <div class="${role === "user" ? "bg-blue-500 text-white" : "bg-gray-200"} 
-#                     inline-block p-3 rounded max-w-[80%]">
-#             ${text}
-#         </div>
-#     `;
+    bubble.className = role === "user"
+        ? "text-right"
+        : "text-left";
 
-#     if (role === "assistant" && sources.length > 0) {
-#         content += `
-#             <div class="text-xs text-gray-500 mt-1">
-#                 Sources:<br>${sources.join("<br>")}
-#             </div>
-#         `;
-#     }
+    let content = `
+        <div class="${role === "user" ? "bg-blue-500 text-white" : "bg-gray-200"} 
+                    inline-block p-3 rounded max-w-[80%]">
+            ${text}
+        </div>
+    `;
 
-#     bubble.innerHTML = content;
-#     chat.appendChild(bubble);
+    if (role === "assistant" && sources.length > 0) {
+        content += `
+            <div class="text-xs text-gray-500 mt-1">
+                Sources:<br>${sources.join("<br>")}
+            </div>
+        `;
+    }
 
-#     chat.scrollTop = chat.scrollHeight;
-# }
+    bubble.innerHTML = content;
+    chat.appendChild(bubble);
 
-# async function ask() {
+    chat.scrollTop = chat.scrollHeight;
+}
 
-#     const input = document.getElementById("question");
-#     const loading = document.getElementById("loading");
+async function ask() {
 
-#     const question = input.value.trim();
+    const input = document.getElementById("question");
+    const loading = document.getElementById("loading");
 
-#     if (!question) return;
+    const question = input.value.trim();
 
-#     addMessage("user", question);
-#     input.value = "";
+    if (!question) return;
 
-#     loading.classList.remove("hidden");
+    addMessage("user", question);
+    input.value = "";
 
-#     try {
+    loading.classList.remove("hidden");
 
-#         const res = await fetch("/chat", {
-#             method: "POST",
-#             headers: {
-#                 "Content-Type": "application/json"
-#             },
-#             body: JSON.stringify({ question })
-#         });
+    try {
 
-#         if (!res.ok) {
-#             throw new Error("Server error");
-#         }
+        const res = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ question })
+        });
 
-#         const data = await res.json();
+        if (!res.ok) {
+            throw new Error("Server error");
+        }
 
-#         addMessage("assistant", data.answer, data.sources);
+        const data = await res.json();
 
-#     } catch (err) {
+        addMessage("assistant", data.answer, data.sources);
 
-#         addMessage("assistant", "⚠️ Error: Unable to get response.");
+    } catch (err) {
 
-#     } finally {
+        addMessage("assistant", "⚠️ Error: Unable to get response.");
 
-#         loading.classList.add("hidden");
+    } finally {
 
-#     }
-# }
+        loading.classList.add("hidden");
 
-# document.getElementById("question")
-#     .addEventListener("keypress", function(e) {
-#         if (e.key === "Enter") ask();
-#     });
+    }
+}
 
-# </script>
+document.getElementById("question")
+    .addEventListener("keypress", function(e) {
+        if (e.key === "Enter") ask();
+    });
 
-# </body>
-# </html>
-# """
+</script>
+
+</body>
+</html>
+"""
+
 
 
 if __name__ == "__main__":
