@@ -74,7 +74,8 @@ Answer:
 def build_rag():
 
     embeddings = HuggingFaceEmbeddings(
-        model_name=EMBEDDING_MODEL
+        model_name=EMBEDDING_MODEL,
+        model_kwargs={"device": "cpu"}
     )
 
     db = Chroma(
@@ -83,7 +84,7 @@ def build_rag():
     )
 
     retriever = db.as_retriever(
-        search_kwargs={"k": TOP_K}
+        search_kwargs={"k": 2}   # reduce from 3–5 → 2
     )
 
     llm = GroqLLM()

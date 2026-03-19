@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 import time
 import os
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -26,10 +28,7 @@ def load_rag():
 
         # 🚨 Skip ingest in production (Render)
         if not os.path.exists("vectorstore"):
-            if os.getenv("RENDER") != "true":
-                ingest()
-            else:
-                print("Skipping ingest on Render")
+            return  # do NOT ingest in prod
 
         retriever, llm, prompt = build_rag()
 
