@@ -45,11 +45,15 @@ Example evaluation questions were created based on the policy documents.
 Total Questions: 20
 
 Groundedness:       100.0%
+
 Citation Accuracy:  90.0%
+
 Exact Match:        75.0%
+
 Partial Match:      95.0%
 
 Latency p50:        2.71 sec
+
 Latency p95:        2.98 sec
 
 ## Improvements
