@@ -30,17 +30,20 @@ Custom Prompting – Enforces strict output format
   python -m venv venv
   venv\Scripts\activate
 
-3. Set environment variables
-  Create a .env file:
-  GROQ_API_KEY = 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
+3.Create API key:
+  Go to https://console.groq.com/keys and create an api key
 
-4. Install dependencies
+4. Set environment variables
+  Create a .env file:
+  GROQ_API_KEY = <created API key>
+
+5. Install dependencies
   pip install -r requirements.txt
 
-5. Run the ingestion script to create the vector database:
+6. Run the ingestion script to create the vector database:
   python -m app.ingest
 
-6. Run the application
+7. Run the application
   python -m app.app
 
   API will be available at:
