@@ -1,77 +1,71 @@
 from flask import Flask, request, jsonify
 import time
 import os
-
-# 🔥 Prevent CPU / memory overuse (VERY IMPORTANT for Render)
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 from dotenv import load_dotenv
 load_dotenv()
 
+
 app = Flask(__name__)
 
 retriever = None
 llm = None
 prompt = None
+
+
 rag_loaded = False
 
-
-# ✅ Lazy load RAG (only when needed)
 def load_rag():
     global retriever, llm, prompt, rag_loaded
 
     if not rag_loaded:
+
         print("Loading RAG...")
 
-        # 🔥 Lazy import to avoid startup crash
+        # Lazy import (CRITICAL)
         from app.rag import build_rag
 
-        # 🚨 Do NOT run ingest in production
+        # 🚨 DO NOT ingest on Render
         if not os.path.exists("vectorstore"):
-            print("WARNING: vectorstore not found")
+            print("Vectorstore missing - skipping ingest in production")
 
         retriever, llm, prompt = build_rag()
 
         rag_loaded = True
+
         print("RAG loaded.")
 
 
-# ✅ Health check endpoint
 @app.route("/health")
 def health():
     return {"status": "ok"}
 
 
-# ✅ Chat endpoint (core logic)
 @app.route("/chat", methods=["POST"])
 def chat():
+    
     load_rag()
 
-    data = request.get_json()
-    question = data.get("question", "").strip()
-
-    if not question:
-        return jsonify({"error": "Question is required"}), 400
+    question = request.json["question"]
 
     start = time.time()
 
     docs = retriever.invoke(question)
 
-    # ✅ Fallback if nothing retrieved
+    # Fallback if nothing retrieved
     if not docs:
         return jsonify({
             "question": question,
             "answer": "I can only answer questions about company policies.",
             "sources": [],
-            "snippets": [],
             "latency_seconds": 0
         })
 
     def clean_source(source):
         return os.path.basename(source).replace("\\", "/")
 
-    # ✅ Build context with document labels
     context = "\n\n".join([
         f"Document: {clean_source(doc.metadata.get('source', 'Unknown'))}\nContent: {doc.page_content}"
         for doc in docs
@@ -94,28 +88,20 @@ def chat():
     latency = time.time() - start
 
     sources = list(set(
-        clean_source(doc.metadata.get("source", "Unknown"))
-        for doc in docs
+        doc.metadata.get("source", "Unknown") for doc in docs
     ))
-
-    snippets = [
-        doc.page_content[:200] + "..."
-        for doc in docs
-    ]
 
     return jsonify({
         "question": question,
         "answer": answer,
         "sources": sources,
-        "snippets": snippets,
-        "latency_seconds": round(latency, 2)
+        "latency_seconds": latency
     })
 
 
-# ✅ Root → Web UI (REQUIRED for assignment)
 @app.route("/")
 def home():
-    return """
+       return """
 <!DOCTYPE html>
 <html>
 <head>
@@ -147,7 +133,9 @@ def home():
 
 <script>
 
-function addMessage(role, text, sources=[], snippets=[]) {
+let chatHistory = [];
+
+function addMessage(role, text, sources=[]) {
 
     const chat = document.getElementById("chat");
 
@@ -165,11 +153,11 @@ function addMessage(role, text, sources=[], snippets=[]) {
     `;
 
     if (role === "assistant" && sources.length > 0) {
-        content += `<div class="text-xs text-gray-500 mt-1">Sources:<br>`;
-        sources.forEach((src, i) => {
-            content += `${src}<br><i>${snippets[i] || ""}</i><br><br>`;
-        });
-        content += `</div>`;
+        content += `
+            <div class="text-xs text-gray-500 mt-1">
+                Sources:<br>${sources.join("<br>")}
+            </div>
+        `;
     }
 
     bubble.innerHTML = content;
@@ -196,15 +184,19 @@ async function ask() {
 
         const res = await fetch("/chat", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({ question })
         });
 
+        if (!res.ok) {
+            throw new Error("Server error");
+        }
+
         const data = await res.json();
 
-        if (!res.ok) throw new Error(data.error || "Server error");
-
-        addMessage("assistant", data.answer, data.sources, data.snippets);
+        addMessage("assistant", data.answer, data.sources);
 
     } catch (err) {
 
@@ -227,7 +219,6 @@ document.getElementById("question")
 </body>
 </html>
 """
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
